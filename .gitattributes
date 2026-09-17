@@ -1,0 +1,23 @@
+# Normalize line endings.
+#
+# This repository is text-only (Markdown, JSON, .mjs). Everything is stored
+# with LF in the object database and checked out with LF on every platform.
+#
+# Without this file, a Windows contributor with `core.autocrlf=true` sees the
+# entire tree (~400 files) as modified after a fresh clone, which buries the
+# real diff. Explicitly pinning `eol=lf` also makes the docs build byte-stable
+# across platforms, so `npm run build:docs -- --check` behaves the same in CI
+# and on a developer machine.
+* text=auto eol=lf
+
+# Defensive: if binary assets are ever added, never touch their bytes.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.pdf  binary
+*.zip  binary
+*.woff  binary
+*.woff2 binary
