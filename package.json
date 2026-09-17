@@ -1,12 +1,46 @@
 {
   "name": "easyeda-api",
-  "version": "1.1.15",
-  "description": "EasyEDA Pro API Skill — WebSocket bridge & API reference",
+  "version": "1.1.16",
+  "description": "EasyEDA Pro API Skill — WebSocket bridge, API reference and document-format specs for AI coding tools",
   "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "server": "node scripts/bridge-server.mjs"
+    "server": "node scripts/bridge-server.mjs",
+    "build:docs": "node scripts/build-docs.mjs",
+    "lint:docs": "node scripts/lint-docs.mjs",
+    "pack": "node scripts/pack.mjs",
+    "pack:fast": "node scripts/pack.mjs --fast",
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "dependencies": {
     "ws": "^8.21.3"
-  }
+  },
+  "keywords": [
+    "easyeda",
+    "easyeda-pro",
+    "eda",
+    "pcb",
+    "schematic",
+    "agent-skills",
+    "websocket",
+    "bridge",
+    "ai-agent"
+  ],
+  "files": [
+    "SKILL.md",
+    "AGENTS.md",
+    "README.md",
+    "README.zh-Hans.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "docs/",
+    "format/",
+    "guide/",
+    "references/",
+    "user-guide/",
+    "scripts/"
+  ]
 }
