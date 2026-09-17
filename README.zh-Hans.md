@@ -2,6 +2,9 @@
 
 # EasyEDA API Skill
 
+[![CI](https://github.com/asdffr12/easyeda-api/actions/workflows/ci.yml/badge.svg)](https://github.com/asdffr12/easyeda-api/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 供 AI 编程工具（Claude Code、OpenCode、QwenCode 等所有支持 [Agent Skills](https://agentskills.io/) 标准的工具）使用的 EasyEDA Pro API 技能包（Skill）。
 
 这个 SKILL 不仅支持 AI 在线调试嘉立创EDA，也支持辅助开发嘉立创EDA扩展。
@@ -12,6 +15,12 @@
 - 🧾 **文档源码格式规范** — 说明工程、原理图、PCB 文档源码格式，适合直接分析和修改源码的场景
 - 🔌 **WebSocket Bridge** — Node.js 服务端，桥接 AI 和 EasyEDA 客户端
 - 🤖 **SKILL.md** — 完整的技能指导文件
+
+## 环境要求
+
+- **Node.js 20 或更高版本** —— Bridge 与构建脚本使用了现代 ESM 和 `node:test`。
+- **嘉立创EDA（EasyEDA Pro）**，并安装 `run-api-gateway.eext` 扩展，才能进行在线 API 调用。
+- 只是**查阅** API 参考的话不需要构建：生成好的索引已随仓库提交，克隆下来即可直接使用。
 
 ## 快速开始
 
@@ -27,7 +36,7 @@ npm install
 npm run build:docs
 ```
 
-这会从 `reference/` 目录读取原始 API 文档，生成结构化文档到 `docs/` 目录。
+这会从 `references/` 目录读取原始 API 文档，生成结构化、机器可读的索引到 `docs/` 目录 —— AI 工具因此可以一次查表把符号名定位到文件，而不必翻遍 340 多个文件。
 
 ### 3. 启动 WebSocket Bridge 服务器
 
@@ -84,6 +93,19 @@ npx clawhub@latest publish dist/easyeda-api/
 
 或上传 zip 文件到 https://clawhub.ai/upload
 
+## 开发
+
+```bash
+npm test                       # Bridge 集成测试（node:test）
+npm run lint:docs              # 校验文档树里的相对链接是否都能解析
+npm run build:docs -- --check  # 检查 docs/ 是否已过期（CI 会跑）
+```
+
+`npm test` 会在一个独立端口段上启动真实的 Bridge，用真实 WebSocket 客户端加一个假 EDA 客户端驱动它，
+断言握手、健康检查、"未连接 EDA" 时的 503 分支，以及完整的 `execute` → `result` 往返。
+
+仓库结构说明与改动时需遵守的规则见 [`AGENTS.md`](./AGENTS.md)。
+
 ## 架构
 
 ```
@@ -106,19 +128,25 @@ npx clawhub@latest publish dist/easyeda-api/
 ## 目录结构
 
 ```
-easyeda-api-skill/
+easyeda-api/
   SKILL.md              # AgentSkills 标准技能定义
-  AGENTS.md              # Agent 提示指南
-  package.json          # 项目配置
-  reference/            # 原始 API 参考文档（gitignore）
-  docs/                 # 构建后的结构化文档（gitignore）
+  AGENTS.md             # 仓库结构与改动规则（给 AI agent / 贡献者）
+  package.json          # 项目配置与 npm 脚本
+  references/           # 原始 API 参考：346 个符号（classes/enums/interfaces/types）
+  docs/                 # 生成的索引（随仓库提交，克隆即可用，无需构建）
+    api-index.json      #   机器可读：符号名 -> 文件、类别、成员数
+    index.md            #   按类别分组的可读索引
+    stats.md            #   覆盖统计
   format/               # 嘉立创EDA文档源码格式规范（project/schematic/pcb）
   guide/                # API 开发指南（人工撰写）
   user-guide/           # 用户指南（人工撰写）
-  server/index.mjs      # WebSocket Bridge 服务器
   scripts/
-    build-docs.mjs      # 文档构建脚本
-    pack.mjs            # 打包脚本
+    bridge-server.mjs   # WebSocket Bridge 服务器（运行时组件）
+    build-docs.mjs      # 从 references/ 构建 docs/
+    lint-docs.mjs       # 校验文档树中的相对链接
+    pack.mjs            # 构建 docs/ 并产出可发布 zip
+  test/
+    bridge.test.mjs     # Bridge 集成测试
   dist/                 # 打包输出（gitignore）
     easyeda-api/        # 可发布的 skill 目录
     easyeda-api.zip     # 用于 ClawHub 上传的 zip 文件

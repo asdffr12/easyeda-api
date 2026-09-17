@@ -2,6 +2,9 @@
 
 # EasyEDA API Skill
 
+[![CI](https://github.com/asdffr12/easyeda-api/actions/workflows/ci.yml/badge.svg)](https://github.com/asdffr12/easyeda-api/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 An EasyEDA Pro API skill package for AI coding tools such as Claude Code, OpenCode, QwenCode, and any other tool that supports the [Agent Skills](https://agentskills.io/) standard.
 
 This skill supports both online debugging of EasyEDA Pro through AI and extension development for EasyEDA Pro.
@@ -12,6 +15,13 @@ If you want to analyze or modify EasyEDA document source files directly instead 
 - 🧾 **Document source format specifications** — Explains project, schematic, and PCB source formats for direct source analysis and modification
 - 🔌 **WebSocket Bridge** — A Node.js server that bridges AI tools and the EasyEDA client
 - 🤖 **SKILL.md** — A complete skill instruction file
+
+## Requirements
+
+- **Node.js 20 or newer** — the bridge and the build scripts use modern ESM and `node:test`.
+- **EasyEDA Pro** with the `run-api-gateway.eext` extension installed, for live API access.
+- No build step is required to *read* the API reference: the generated index in
+  `docs/` is committed, so a fresh clone is usable immediately.
 
 ## Quick Start
 
@@ -27,7 +37,9 @@ npm install
 npm run build:docs
 ```
 
-This reads the raw API documentation from the `reference/` directory and generates structured docs into the `docs/` directory.
+This reads the raw API documentation from the `references/` directory and generates a
+structured, machine-readable index into the `docs/` directory — so an AI tool can resolve a
+symbol name to a file in one lookup instead of scanning 340+ files.
 
 ### 3. Start the WebSocket Bridge server
 
@@ -84,6 +96,21 @@ npx clawhub@latest publish dist/easyeda-api/
 
 Or upload the zip file at https://clawhub.ai/upload
 
+## Development
+
+```bash
+npm test                       # bridge integration tests (node:test)
+npm run lint:docs              # verify relative links in the doc trees resolve
+npm run build:docs -- --check  # fail if docs/ is stale (run by CI)
+```
+
+`npm test` boots the real bridge on an isolated port range and drives it with a real
+WebSocket client plus a fake EDA client. It asserts the handshake, the health endpoint,
+the "no EDA attached" → 503 path, and a full `execute` → `result` round trip.
+
+See [`AGENTS.md`](./AGENTS.md) for a map of the repository and the rules that apply when
+changing it.
+
 ## Architecture
 
 ```
@@ -106,19 +133,25 @@ Or upload the zip file at https://clawhub.ai/upload
 ## Directory Structure
 
 ```text
-easyeda-api-skill/
+easyeda-api/
   SKILL.md              # AgentSkills standard skill definition
-  AGENTS.md             # Agent prompt guide
-  package.json          # Project configuration
-  reference/            # Raw API reference docs (gitignored)
-  docs/                 # Built structured docs (gitignored)
+  AGENTS.md             # Repository map + rules for AI agents and contributors
+  package.json          # Project configuration and npm scripts
+  references/           # Raw API reference: 346 symbols (classes/enums/interfaces/types)
+  docs/                 # Generated index — committed, so no build step is needed to read it
+    api-index.json      #   machine-readable: name -> file, kind, member count
+    index.md            #   human-readable index grouped by kind
+    stats.md            #   coverage statistics
   format/               # EasyEDA document source format specs (project/schematic/pcb)
   guide/                # API development guides
   user-guide/           # User guides
-  server/index.mjs      # WebSocket Bridge server
   scripts/
-    build-docs.mjs      # Documentation build script
-    pack.mjs            # Packaging script
+    bridge-server.mjs   # WebSocket bridge server (the runtime component)
+    build-docs.mjs      # Builds docs/ from references/
+    lint-docs.mjs       # Verifies relative links in the doc trees resolve
+    pack.mjs            # Builds docs/ and produces the publishable zip
+  test/
+    bridge.test.mjs     # Bridge integration tests
   dist/                 # Packaging output (gitignored)
     easyeda-api/        # Publishable skill directory
     easyeda-api.zip     # Zip archive for ClawHub upload

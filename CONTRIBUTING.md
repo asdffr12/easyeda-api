@@ -18,12 +18,17 @@ git clone https://github.com/asdffr12/easyeda-api.git
 cd easyeda-api
 npm install
 npm run server      # starts the WebSocket bridge
+npm test            # runs the bridge integration tests
 ```
 
 ## Pull request checklist
 
 - [ ] Keep one logical change per pull request.
-- [ ] Run `npm run lint:docs` (link check) if you touched markdown under `references/` or `format/`.
+- [ ] Run `npm test` — the bridge integration tests must pass.
+- [ ] Run `npm run lint:docs` if you touched markdown under `references/`, `format/`,
+      `guide/` or `user-guide/` — it catches links that no longer resolve.
+- [ ] Run `npm run build:docs` if you changed anything under `references/`, and commit
+      the regenerated `docs/` (CI fails if the committed index is stale).
 - [ ] Update `CHANGELOG.md` under an "Unreleased" heading.
 - [ ] Do not paste API keys, tokens or private project data into issues or commits.
 
