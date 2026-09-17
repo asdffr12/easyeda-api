@@ -13,7 +13,7 @@
     "lint:docs": "node scripts/lint-docs.mjs",
     "pack": "node scripts/pack.mjs",
     "pack:fast": "node scripts/pack.mjs --fast",
-    "test": "node --test \"test/**/*.test.mjs\""
+    "test": "node --test"
   },
   "dependencies": {
     "ws": "^8.21.3"

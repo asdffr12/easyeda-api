@@ -44,6 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of `references/`, `server/index.mjs` instead of
   `scripts/bridge-server.mjs`, and `AGENTS.md` / `scripts/build-docs.mjs` /
   `scripts/pack.mjs` / `test/` that were referenced but never committed.
+- `npm test` used a glob (`node --test "test/**/*.test.mjs"`), which only works
+  on Node 21+. On Node 20 the glob is passed through literally and the run fails
+  with `Could not find '...test\**\*.test.mjs'`, so CI was red on the Node 20 leg.
+  Now uses the test runner's own discovery (`node --test`), which finds the same
+  ten tests on both Node 20 and Node 22.
 
 ### Changed
 - `docs/` is now committed rather than gitignored, so a fresh clone has a working
