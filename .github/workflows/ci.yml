@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check scripts
+        run: |
+          node --check scripts/bridge-server.mjs
+          node --check scripts/build-docs.mjs
+          node --check scripts/lint-docs.mjs
+          node --check scripts/pack.mjs
+
+      - name: Lint documentation links
+        run: npm run lint:docs
+
+      - name: Verify docs/ is up to date
+        run: npm run build:docs -- --check
+
+      - name: Run tests
+        run: npm test
+
+      - name: Package (smoke test)
+        run: npm run pack:fast
+
+      - name: Upload package artifact
+        if: matrix.node-version == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: easyeda-api-skill
+          path: dist/easyeda-api.zip
+          if-no-files-found: error
