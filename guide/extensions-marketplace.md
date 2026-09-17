@@ -2,7 +2,7 @@
 
 EasyEDA Extensions Marketplace site [https://jlcext.com](https://jlcext.com), which is a professional platform for users to download and share extensions.
 
-If you want to learn how to develop extensions, please refer to the [how-to-start](./how-to-start), which describes in detail how to install the development environment and build your own EasyEDA Pro extension from scratch.
+If you want to learn how to develop extensions, please refer to the [how-to-start](./how-to-start.md), which describes in detail how to install the development environment and build your own EasyEDA Pro extension from scratch.
 
 ## Publishing Your Extension
 

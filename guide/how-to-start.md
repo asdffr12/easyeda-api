@@ -9,7 +9,7 @@ Each extension requires a UUID as the uniquely identifiable name of the extensio
 
 ::: info
 
-If you are using [pro-api-sdk](./ancillary-projects/pro-api-sdk), a new UUID will be automatically generated for you the first time you run `npm run build`.
+If you are using [pro-api-sdk](./ancillary-projects/pro-api-sdk.md), a new UUID will be automatically generated for you the first time you run `npm run build`.
 
 If you wish to build the full development environment manually, you can also safely use <code id="generatedUuid"></code> as the UUID for the new extension, which is randomly generated when you visit the current page.
 

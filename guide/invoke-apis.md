@@ -2,7 +2,7 @@
 
 ## Invoke Method
 
-There are many classes under the EasyEDA Pro Extension API module, all **Classes**, **Enumerations**, **Interfaces**, **Type Aliases** are registered under the `EDA` base class by default and have been instantiated as [eda](../reference/pro-api.eda) object exists in the root scope of every extension runtime, and you can access it directly through the `eda` object.
+There are many classes under the EasyEDA Pro Extension API module, all **Classes**, **Enumerations**, **Interfaces**, **Type Aliases** are registered under the `EDA` base class by default and have been instantiated as [eda](../references/classes/EDA.md) object exists in the root scope of every extension runtime, and you can access it directly through the `eda` object.
 
 All extension's runtime get a separate `eda` object, which is not shared with other extensions. You can output this object on the console in [Debug Mode](#entering-debug-mode) within an extension (or in [Standalone Script](#debugging-with-standalone-scripting)) using the following code:
 
