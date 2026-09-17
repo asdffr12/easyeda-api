@@ -36,10 +36,19 @@ import { createServer, get as httpGet } from 'node:http';
 import { createConnection } from 'node:net';
 
 // ─── Port Configuration ─────────────────────────────────────────────
-const PORT_START = 49620;
-const PORT_END = 49629;
+// The range is overridable so the integration tests can run against an
+// isolated range instead of colliding with a bridge the user already has open.
+const PORT_START = Number(process.env.EASYEDA_BRIDGE_PORT_START || 49620);
+const PORT_END = Number(process.env.EASYEDA_BRIDGE_PORT_END || 49629);
 const SERVICE_ID = 'easyeda-bridge';
 const LISTEN_HOST = '127.0.0.1';
+
+/**
+ * Errors that mean "no usable EasyEDA client is attached" — a state the caller
+ * can act on (tell the user to open EasyEDA) rather than a server fault. These
+ * map to HTTP 503; everything else is a 500.
+ */
+const NOT_CONNECTED_RE = /no eda window|no longer connected|not connected|not found in connected|not in connected state/i;
 
 function formatBannerLine(label, value) {
   return `║  ${`${label}:`.padEnd(12)} ${String(value).padEnd(44)}║`;
@@ -220,7 +229,10 @@ const httpServer = createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, result, windowId: windowId || activeEdaWindowId }));
     } catch (err) {
-      const status = err.message?.includes('not connected') ? 503 : 500;
+      // 503 = "EasyEDA is not attached", which the caller should surface to the
+      // user. Previously this matched on 'not connected' only, so the common
+      // "No EDA window connected" case fell through to a misleading 500.
+      const status = NOT_CONNECTED_RE.test(err.message || '') ? 503 : 500;
       res.writeHead(status, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, error: err.message }));
     }
