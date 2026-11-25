@@ -5,9 +5,11 @@ SRC="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$HOME/.exitproxy/http_proxy.py" ] || cp "$SRC/http_proxy.py" "$HOME/.exitproxy/http_proxy.py"
 cat > "$HOME/.exitproxy/keep.sh" <<'EOF'
 #!/bin/bash
+export PATH="$HOME/.python/current/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 cd "$HOME/.exitproxy"
 while true; do python3 http_proxy.py >> proxy.log 2>&1; sleep 2; done
 EOF
 chmod +x "$HOME/.exitproxy/keep.sh"
 pgrep -f 'kee[p]\.sh' >/dev/null || setsid nohup bash "$HOME/.exitproxy/keep.sh" </dev/null >/dev/null 2>&1 &
+sleep 2
 exit 0
