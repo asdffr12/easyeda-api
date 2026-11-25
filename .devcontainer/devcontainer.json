@@ -1,0 +1,4 @@
+{
+  "name": "free-exit",
+  "postStartCommand": "bash .devcontainer/boot.sh"
+}
